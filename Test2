@@ -1,0 +1,33 @@
+import spidev
+import time
+
+# Setup SPI
+spi = spidev.SpiDev()  # Create an SPI object
+spi.open(0, 0)         # Open SPI bus 0, device (CS) 0
+spi.max_speed_hz = 50000
+spi.mode = 0           # SPI mode (0, 1, 2, or 3) depending on your Arduino settings
+
+def send_message(message):
+    # Convert message to bytes
+    byte_message = [ord(char) for char in message]  # Convert each character to its ASCII value
+    byte_message.append(0)  # Add a null character as a message terminator
+
+    print("Sending message:", message)
+
+    for byte in byte_message:
+        # Send each byte and receive a response (for debugging, though response is ignored)
+        response = spi.xfer2([byte])
+        print(f"Sent: {chr(byte)}, Received: {response[0]}")
+        time.sleep(0.1)  # Short delay to allow the Arduino to process
+
+try:
+    while True:
+        # Get user input and send it
+        message = input("Enter a message to send: ")
+        send_message(message)
+        time.sleep(1)
+
+except KeyboardInterrupt:
+    pass
+
+spi.close()
