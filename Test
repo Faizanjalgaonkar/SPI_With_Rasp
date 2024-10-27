@@ -1,0 +1,27 @@
+import spidev
+import time
+
+# SPI setup
+spi = spidev.SpiDev()  # Create an SPI object
+spi.open(0, 0)         # Open SPI bus 0, device (CS) 0
+spi.max_speed_hz = 50000
+
+def send_data(value):
+    # Send a byte and receive a response
+    response = spi.xfer2([value])
+    return response[0]
+
+try:
+    while True:
+        to_send = int(input("Enter a value to send (0-255): "))
+        if 0 <= to_send <= 255:
+            response = send_data(to_send)
+            print(f"Sent: {to_send}, Received: {response}")
+        else:
+            print("Please enter a value between 0 and 255.")
+        time.sleep(1)
+
+except KeyboardInterrupt:
+    pass
+
+spi.close()
